@@ -74,23 +74,23 @@ vector<int> toBinary(string buffer){
 vector<int> convertFileToBinary(const string& name){
     vector<int> binaryCode;
     ifstream in(name, ios::binary);
-    string text;
-    while (getline(in,text)) {
-    app(binaryCode,toBinary(text));
+    char c;
+    while (in.get(c)) {
+        uint8_t byte = static_cast<uint8_t>(static_cast<unsigned char>(c));
+        for (int bit = 7; bit >= 0; --bit) {
+            binaryCode.push_back((byte >> bit) & 1U);
+        }
     }
-    in.close();
-    return binaryCode; 
+    return binaryCode;
 }
 
 void padding(vector<int>& binaryCode) {
     uint64_t originalBitLength = binaryCode.size();
-
     binaryCode.push_back(1);
 
     while (binaryCode.size() % 512 != 448) {
         binaryCode.push_back(0);
     }
-
     for (int bit = 63; bit >= 0; --bit) {
         binaryCode.push_back(
             (originalBitLength >> bit) & 1ULL
@@ -111,6 +111,7 @@ vector<vector<int>> split512Chunks(const vector<int>&paddedBinaryCode){
     }
     return split512Chunks;
 }
+
 vector<uint32_t>split512ChunkTo32Bits(const vector<int>& chunk){
     vector<uint32_t> w(0);
     uint32_t value;
@@ -166,8 +167,18 @@ void mixup(const vector<uint32_t>& w){
     
 
 }
+void resetHashVals(){
+    h0 = 0x6a09e667;
+    h1 = 0xbb67ae85;
+    h2 = 0x3c6ef372;
+    h3 = 0xa54ff53a;
+    h4 = 0x510e527f;
+    h5 = 0x9b05688c;
+    h6 = 0x1f83d9ab;
+    h7 = 0x5be0cd19;
+}
 string finalHash() {
-
+    resetHashVals();
     stringstream output;
 
     output<<hex<<setfill('0')<<setw(8)<<h0<<setw(8)<<h1<<setw(8)<<h2<<setw(8)<<h3<<setw(8)<<h4<< setw(8) << h5<< setw(8) << h6<< setw(8) << h7;
@@ -175,15 +186,16 @@ string finalHash() {
     return output.str();
 
 }
-
-int main() {
-    vector<int> text =convertFileToBinary("text.txt");
+string hashFile(string fileName){
+    vector<int> text =convertFileToBinary(fileName);
     padding(text);
     vector<vector<int>> blocks =split512Chunks(text);
     for (const vector<int>& block : blocks) {
         vector<uint32_t> w =split512ChunkTo32Bits(block);
         mixup(w);
     }
-    cout << finalHash() << '\n';
-
+    return finalHash();
 }
+
+
+
