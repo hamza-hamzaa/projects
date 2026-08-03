@@ -178,7 +178,7 @@ void resetHashVals(){
     h7 = 0x5be0cd19;
 }
 string finalHash() {
-    resetHashVals();
+    
     stringstream output;
 
     output<<hex<<setfill('0')<<setw(8)<<h0<<setw(8)<<h1<<setw(8)<<h2<<setw(8)<<h3<<setw(8)<<h4<< setw(8) << h5<< setw(8) << h6<< setw(8) << h7;
@@ -187,6 +187,7 @@ string finalHash() {
 
 }
 string hashFile(string fileName){
+    resetHashVals();
     vector<int> text =convertFileToBinary(fileName);
     padding(text);
     vector<vector<int>> blocks =split512Chunks(text);
