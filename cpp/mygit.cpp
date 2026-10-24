@@ -456,28 +456,17 @@ void addFile(const string& fileName){
 int main(){
     //createRepo(".mygit");
     //addFile("SHA256.cpp");
-    ////commit("f");
-    ////createRepo(".mygit");
+    //commit("f");
+
     //addFile("huffman.cpp");
-    ////commit("s");
-    ////createRepo(".mygit");
+    commit("s");
+
     //addFile("barcode.cpp");
-    ////commit("t");
+    //commit("t");
     //
-    addFile("test.txt");
+    //addFile("test.txt");
     //commit("testing ");
-
-    //unordered_map<string,string>t=Hash_FileNamesFromHEAD();
-    //for(auto i:t){
-    //    cout<<i.first<<" "<<i.second<<endl;
-    //}
-
+//
     status();
     
-
-
-
-
-
-
-}
+}//hello world. 'insert card here'

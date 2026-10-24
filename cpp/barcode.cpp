@@ -1,3 +1,10 @@
+/*
+barcodes support many encryption types such as code-128 EAN13 ITF14 and more. with one of it most common forms 
+being code128 it works by first having what is known as a queit zone that is 10 strips of white then a start symbol
+this is used to differentiate between the three types of Code128 barcode which are A,B,C then the actual 
+encrypted text. text is encrypted into an 11 strip mix of black and white strips that alternate then a checksum
+that ensures the barcode is accurate and not corrupted finally a stop sequence and a queit zone
+*/
 #include<bitset>
 #include<vector>
 #include<iostream>
@@ -5,7 +12,7 @@
 #include<unordered_map>
 using namespace std;
 
-
+//a map that maps asciicharacters to their Code128 equivalent specifically code 128B
 unordered_map <char, string> code128B = {
 {' '    ,"212222"},
 {'!'    ,"222122"},
@@ -105,7 +112,9 @@ unordered_map <char, string> code128B = {
 vector<int> startseq={2,1,1,2,1,4};
 vector<int> stopseq={2,3,3,1,1,1,2};
 
+//converts text into its equivalent code128 numeric value then summs each element in the text
 int calcCheckSum(const string& text){
+    //starts from 104 to account for code128b startsequence
     int sum=104;
     int multiplier=1;
     for(int i=0;i<text.length();i++){
@@ -115,7 +124,7 @@ int calcCheckSum(const string& text){
     sum=sum%103;
     return sum;
 }
-
+//converts specific char into an int vector to draw
 vector<int> extractWidths(char c){
     vector<int>arr(0);
     string num=code128B[c];
@@ -125,10 +134,12 @@ vector<int> extractWidths(char c){
     }
     return arr;
 }
+//vector append function but since ii use it so much i made it a bit more easily usable
 void app(vector<int>& inital,const vector<int>& final){
     inital.insert(inital.end(),final.begin(),final.end());
     
 }
+//uses helper function(extractwidths) to convert text into a vector of ints
 vector<int> allWidths(const string& buffer){
     vector<int> arr(0);
     for(int i=0;i<buffer.length();i++){
@@ -136,6 +147,7 @@ vector<int> allWidths(const string& buffer){
     }
     return arr;
 }
+//this is the helper drawing function that takes each int in the completed int vector and draws it onto a canvas using raylib
 void Draw(const vector<int> &widths){
     int pos_X=0;
     bool colour = true;
@@ -150,18 +162,15 @@ void Draw(const vector<int> &widths){
     }
     DrawRectangle(pos_X, 0, 10*factor, 200, WHITE);
 }
-
-
-
-int main(){
-    string text;
-    cin>>text;
+//this is the main drawing functionn that combines the startseq, text, checksum an endseq vectors into one 
+//then draws them by initalizing a window first. this helps not show the user the core design of the
+// code but only the results
+void drawBarcode(string text){
     vector<int> complete=startseq;
     vector<int> arr=allWidths(text);
     app(complete,arr);
     app(complete,extractWidths(static_cast<char>(calcCheckSum(text)+32)));
     app(complete,stopseq);
-
     InitWindow(1000, 200, "Barcode");
     while (!WindowShouldClose()) {
         BeginDrawing();
@@ -169,8 +178,12 @@ int main(){
         Draw(complete);
         EndDrawing();
     }
-   
-
     CloseWindow();
+}
+
+int main(){
+    string text;
+    cin>>text;
+    drawBarcode(text);
 }
 
